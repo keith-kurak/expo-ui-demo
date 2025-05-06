@@ -10,15 +10,22 @@ import Animated, {
   runOnJS,
   useAnimatedGestureHandler,
 } from "react-native-reanimated";
-import { PanGestureHandler } from "react-native-gesture-handler";
+import {
+  PanGestureHandler,
+  GestureHandlerRootView,
+} from "react-native-gesture-handler";
 import DraggableFlatList, {
   RenderItemParams,
   ScaleDecorator,
+  DragEndParams,
 } from "react-native-draggable-flatlist";
 import { FlatList } from "react-native";
 
 // Import workout data
 import workouts from "../data/workouts.json";
+
+// Import the EditWorkoutSheet component
+import EditWorkoutSheet from "../components/EditWorkoutSheet";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const DELETE_BUTTON_WIDTH = 80;
@@ -28,15 +35,40 @@ interface Workout {
   id: number;
   name: string;
   iconName: string;
+  nextScheduledTime: string | null;
   workoutType: string;
+  needsCooldown: boolean;
+  reps: string;
+  minutes: number;
+  intensity: number;
   colorHex: string;
-  // Add other properties as needed
 }
 
 export default function WorkoutListScreen() {
   const [data, setData] = useState<Workout[]>(workouts);
   const [isEditMode, setIsEditMode] = useState(false);
   const router = useRouter();
+
+  // State for the edit workout sheet
+  const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
+  const [isEditSheetVisible, setIsEditSheetVisible] = useState(false);
+
+  const handleWorkoutPress = useCallback((workout: Workout) => {
+    setSelectedWorkout(workout);
+    setIsEditSheetVisible(true);
+  }, []);
+
+  const handleWorkoutSave = useCallback((updatedWorkout: Workout) => {
+    setData((currentData) =>
+      currentData.map((item) =>
+        item.id === updatedWorkout.id ? updatedWorkout : item
+      )
+    );
+  }, []);
+
+  const handleDragEnd = useCallback((params: DragEndParams<Workout>) => {
+    setData(params.data);
+  }, []);
 
   const renderItem = useCallback(
     ({ item, drag, isActive, getIndex }: RenderItemParams<Workout>) => {
@@ -78,11 +110,13 @@ export default function WorkoutListScreen() {
         );
       } else {
         return (
-          <SwipeableRow item={item} onDelete={() => handleDelete(item.id)} />
+          <Pressable onPress={() => handleWorkoutPress(item)}>
+            <SwipeableRow item={item} onDelete={() => handleDelete(item.id)} />
+          </Pressable>
         );
       }
     },
-    [isEditMode]
+    [isEditMode, handleWorkoutPress]
   );
 
   const handleDelete = useCallback((id: number) => {
@@ -207,63 +241,75 @@ export default function WorkoutListScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Stack.Screen
-        options={{
-          title: "Workouts",
-          headerRight: () => (
-            <Pressable onPress={toggleEditMode} style={styles.editButton}>
-              <Text style={styles.editButtonText}>
-                {isEditMode ? "Done" : "Edit"}
-              </Text>
-            </Pressable>
-          ),
-        }}
-      />
-
-      {isEditMode ? (
-        <DraggableFlatList
-          data={data}
-          onDragEnd={({ data }) => setData(data)}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={renderItem}
-          contentContainerStyle={styles.list}
-          ItemSeparatorComponent={() => (
-            <View
-              style={{
-                height: StyleSheet.hairlineWidth,
-                backgroundColor: "#DDDDDD",
-              }}
-            />
-          )}
-        />
-      ) : (
-        <FlatList
-          data={data}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item, index }) => {
-            // Create a simpler version of RenderItemParams for non-edit mode
-            const params: RenderItemParams<Workout> = {
-              item,
-              drag: () => {},
-              isActive: false,
-              getIndex: () => index,
-            };
-            return renderItem(params);
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <Stack.Screen
+          options={{
+            title: "Workouts",
+            headerRight: () => (
+              <Pressable onPress={toggleEditMode} style={styles.editButton}>
+                <Text style={styles.editButtonText}>
+                  {isEditMode ? "Done" : "Edit"}
+                </Text>
+              </Pressable>
+            ),
           }}
-          contentContainerStyle={styles.list}
-          ItemSeparatorComponent={() => (
-            <View
-              style={{
-                height: StyleSheet.hairlineWidth,
-                backgroundColor: "#DDDDDD",
-              }}
-            />
-          )}
-          showsVerticalScrollIndicator={false}
         />
-      )}
-    </View>
+
+        {isEditMode ? (
+          <DraggableFlatList
+            data={data}
+            onDragEnd={handleDragEnd}
+            keyExtractor={(item: Workout) => item.id.toString()}
+            renderItem={renderItem}
+            contentContainerStyle={styles.list}
+            ItemSeparatorComponent={() => (
+              <View
+                style={{
+                  height: StyleSheet.hairlineWidth,
+                  backgroundColor: "#DDDDDD",
+                }}
+              />
+            )}
+          />
+        ) : (
+          <FlatList
+            data={data}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item, index }) => {
+              // Create a simpler version of RenderItemParams for non-edit mode
+              const params: RenderItemParams<Workout> = {
+                item,
+                drag: () => {},
+                isActive: false,
+                getIndex: () => index,
+              };
+              return renderItem(params);
+            }}
+            contentContainerStyle={styles.list}
+            ItemSeparatorComponent={() => (
+              <View
+                style={{
+                  height: StyleSheet.hairlineWidth,
+                  backgroundColor: "#DDDDDD",
+                }}
+              />
+            )}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
+
+        {/* Edit Workout Bottom Sheet */}
+        {selectedWorkout && (
+          <EditWorkoutSheet
+            workout={selectedWorkout}
+            isVisible={isEditSheetVisible}
+            onClose={() => setIsEditSheetVisible(false)}
+            onSave={handleWorkoutSave}
+          />
+        )}
+      </View>
+    </GestureHandlerRootView>
   );
 }
 
