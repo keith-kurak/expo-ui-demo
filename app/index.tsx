@@ -56,7 +56,6 @@ export default function WorkoutListScreen() {
                   style={styles.deleteIcon}
                   onPress={() => handleDelete(item.id)}
                 />
-                <Ionicons name="reorder-three" size={24} color="#666" />
               </View>
               <View style={styles.workoutInfo}>
                 <View
@@ -73,6 +72,7 @@ export default function WorkoutListScreen() {
                 </View>
                 <Text style={styles.workoutName}>{item.name}</Text>
               </View>
+              <Ionicons name="reorder-three" size={24} color="#666" />
             </Pressable>
           </ScaleDecorator>
         );
@@ -129,7 +129,7 @@ export default function WorkoutListScreen() {
     onDelete: () => void;
   }) => {
     const translateX = useSharedValue(0);
-    const rowHeight = useSharedValue(70);
+    const rowHeight = useSharedValue(60);
     const opacity = useSharedValue(1);
 
     const panGesture = useAnimatedGestureHandler({
@@ -228,7 +228,14 @@ export default function WorkoutListScreen() {
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
           contentContainerStyle={styles.list}
-          ItemSeparatorComponent={null}
+          ItemSeparatorComponent={() => (
+            <View
+              style={{
+                height: StyleSheet.hairlineWidth,
+                backgroundColor: "#DDDDDD",
+              }}
+            />
+          )}
         />
       ) : (
         <FlatList
@@ -245,7 +252,14 @@ export default function WorkoutListScreen() {
             return renderItem(params);
           }}
           contentContainerStyle={styles.list}
-          ItemSeparatorComponent={null}
+          ItemSeparatorComponent={() => (
+            <View
+              style={{
+                height: StyleSheet.hairlineWidth,
+                backgroundColor: "#DDDDDD",
+              }}
+            />
+          )}
           showsVerticalScrollIndicator={false}
         />
       )}
@@ -263,12 +277,10 @@ const styles = StyleSheet.create({
   },
   row: {
     backgroundColor: "white",
-    paddingVertical: 16,
+    height: 60,
     paddingHorizontal: 16,
     flexDirection: "row",
     alignItems: "center",
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#DDDDDD",
   },
   activeRow: {
     backgroundColor: "#f0f0f0",
@@ -281,7 +293,7 @@ const styles = StyleSheet.create({
   deleteContainer: {
     position: "absolute",
     right: 0,
-    height: "100%",
+    height: 60,
     width: DELETE_BUTTON_WIDTH,
     justifyContent: "center",
     alignItems: "flex-end",
@@ -289,7 +301,7 @@ const styles = StyleSheet.create({
   deleteButton: {
     backgroundColor: "red",
     width: DELETE_BUTTON_WIDTH,
-    height: "100%",
+    height: 60,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -308,9 +320,7 @@ const styles = StyleSheet.create({
   list: {
     paddingBottom: 20,
   },
-  editButton: {
-    marginRight: 16,
-  },
+  editButton: { width: 40 },
   editButtonText: {
     color: "#007AFF",
     fontSize: 16,
