@@ -14,6 +14,7 @@ import {
   Pressable,
   ScrollView,
   Dimensions,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet, {
@@ -185,7 +186,7 @@ const EditWorkoutSheet = ({
       onClose={onClose}
       backdropComponent={renderBackdrop}
       handleIndicatorStyle={styles.bottomSheetIndicator}
-      enableContentPanningGesture={true}
+      enableContentPanningGesture={Platform.OS === "ios" ? false : false}
     >
       <BottomSheetView style={styles.container}>
         <ScrollView showsVerticalScrollIndicator={false}>
