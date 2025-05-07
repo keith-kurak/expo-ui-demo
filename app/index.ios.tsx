@@ -16,7 +16,7 @@ import * as React from "react";
 // Import workout data
 import workouts from "../data/workouts.json";
 import { useState } from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 
 interface Workout {
   id: number;
@@ -39,6 +39,8 @@ export default function ListScreen() {
       listStyle="automatic"
       scrollEnabled
       selectEnabled
+      moveEnabled
+      deleteEnabled
       onSelectionChange={(items) => {
         console.log("select");
         setSelectedWorkout(data[items[0]]);
