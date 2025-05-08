@@ -3,8 +3,8 @@ import { useRouter, Stack, useLocalSearchParams } from "expo-router";
 
 import workouts from "../../data/workouts.json";
 import { useState } from "react";
-import { Gauge, Section } from "@expo/ui/swift-ui";
-import { Host, Text, HStack, VStack } from "@expo/ui/swift-ui-primitives";
+import { DateTimePicker, Gauge, Section } from "@expo/ui/swift-ui";
+import { Host, Text, HStack, VStack, Form } from "@expo/ui/swift-ui-primitives";
 
 export default function EditWorkout() {
   const { workoutId } = useLocalSearchParams();
@@ -49,6 +49,21 @@ export default function EditWorkout() {
             />
           </VStack>
         </HStack>
+        <Section title="SCHEDULE">
+          <DateTimePicker
+            onDateSelected={(date) => {
+              try {
+                workout!.nextScheduledTime = date.toISOString();
+              } catch (error) {
+                console.log(error);
+              }
+            }}
+            displayedComponents="dateAndTime"
+            initialDate={workout?.nextScheduledTime}
+            title="Next workout"
+            variant="automatic"
+          />
+        </Section>
       </Host>
     </View>
   );
