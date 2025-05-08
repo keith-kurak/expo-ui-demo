@@ -3,7 +3,8 @@ import { useRouter, Stack, useLocalSearchParams } from "expo-router";
 
 import workouts from "../../data/workouts.json";
 import { useState } from "react";
-import { Host, Text } from "@expo/ui/swift-ui-primitives";
+import { Gauge, Section } from "@expo/ui/swift-ui";
+import { Host, Text, HStack, VStack } from "@expo/ui/swift-ui-primitives";
 
 export default function EditWorkout() {
   const { workoutId } = useLocalSearchParams();
@@ -26,7 +27,28 @@ export default function EditWorkout() {
         }}
       />
       <Host style={{ height: 600 }}>
-        <Text>Edit</Text>
+        <HStack spacing={20} frame={{ height: 150 }}>
+          <VStack frame={{ width: 100 }}>
+            <Text>Intensity</Text>
+            <Gauge
+              current={{ value: workout?.intensity }}
+              max={{ value: 100, label: "100" }}
+              min={{ value: 0, label: "0" }}
+              type="circular"
+              color={workout?.colorHex}
+            />
+          </VStack>
+          <VStack frame={{ width: 100 }}>
+            <Text>Minutes</Text>
+            <Gauge
+              current={{ value: workout?.minutes }}
+              max={{ value: 100, label: "100" }}
+              min={{ value: 0, label: "0" }}
+              type="circular"
+              color={workout?.colorHex}
+            />
+          </VStack>
+        </HStack>
       </Host>
     </View>
   );
