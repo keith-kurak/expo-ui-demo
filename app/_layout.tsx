@@ -28,6 +28,14 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
+          <Stack.Screen
+            name="[workoutId]/edit"
+            options={{
+              presentation: "formSheet",
+              sheetAllowedDetents: "fitToContents",
+            }}
+          />
+          ;
         </Stack>
         <StatusBar style="auto" />
       </GestureHandlerRootView>

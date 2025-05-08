@@ -19,7 +19,8 @@ import * as React from "react";
 // Import workout data
 import workouts from "../data/workouts.json";
 import { useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { Pressable, ScrollView, View, Button as RNButton } from "react-native";
+import { Stack, useRouter } from "expo-router";
 
 interface Workout {
   id: number;
@@ -36,19 +37,39 @@ interface Workout {
 
 export default function ListScreen() {
   const [data, setData] = useState<Workout[]>(workouts);
-  const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
-  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const [isEditModeEnabled, setIsEditModeEnabled] = useState(false);
 
-  console.log(isBottomSheetOpen);
+  const router = useRouter();
 
   return (
     <>
-      <List listStyle="automatic" moveEnabled deleteEnabled>
+      <Stack.Screen
+        options={{
+          title: "Workouts",
+          headerLargeTitle: true,
+          headerRight: () => (
+            <View style={{ width: 60 }}>
+              <RNButton
+                title={isEditModeEnabled ? "Done" : "Edit"}
+                onPress={() => {
+                  setIsEditModeEnabled(!isEditModeEnabled);
+                }}
+              />
+            </View>
+          ),
+        }}
+      />
+      <List
+        listStyle="automatic"
+        moveEnabled
+        deleteEnabled
+        scrollEnabled
+        editModeEnabled={isEditModeEnabled}
+      >
         {workouts.map((workout) => (
           <HStack
             onPress={() => {
-              setSelectedWorkout(workout);
-              setIsBottomSheetOpen(true);
+              router.navigate(`./${workout.id}/edit`);
             }}
             key={workout.id}
           >
@@ -62,54 +83,6 @@ export default function ListScreen() {
           </HStack>
         ))}
       </List>
-      <BottomSheet
-        onIsOpenedChange={(e) => setIsBottomSheetOpen(e)}
-        isOpened={isBottomSheetOpen}
-      >
-        <Host matchContents useViewportSizeMeasurement>
-          <VStack frame={{ height: 300 }}>
-            <Text>{selectedWorkout?.name}</Text>
-            <Section title="">
-              <HStack>
-                <VStack>
-                  <Text>Intensity</Text>
-                  <Gauge
-                    current={{ value: selectedWorkout?.intensity }}
-                    max={{ value: 100, label: "100" }}
-                    min={{ value: 0, label: "0" }}
-                    type="circular"
-                    color={selectedWorkout?.colorHex}
-                  />
-                </VStack>
-                <VStack>
-                  <Text>Minutes</Text>
-                  <Gauge
-                    current={{ value: selectedWorkout?.minutes }}
-                    max={{ value: 100, label: "100" }}
-                    min={{ value: 0, label: "0" }}
-                    type="circular"
-                    color={selectedWorkout?.colorHex}
-                  />
-                </VStack>
-              </HStack>
-            </Section>
-            <Section title="Intensity">
-              <DateTimePicker
-                onDateSelected={(date) => {
-                  try {
-                    selectedWorkout!.nextScheduledTime = date.toISOString();
-                  } catch (error) {
-                    console.log(error);
-                  }
-                }}
-                displayedComponents="dateAndTime"
-                initialDate={selectedWorkout?.nextScheduledTime}
-                variant="automatic"
-              />
-            </Section>
-          </VStack>
-        </Host>
-      </BottomSheet>
     </>
   );
 }
