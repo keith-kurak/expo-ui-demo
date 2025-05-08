@@ -30,10 +30,12 @@ export default function RootLayout() {
           <Stack.Screen name="+not-found" />
           <Stack.Screen
             name="[workoutId]/edit"
-            options={{
-              presentation: "formSheet",
-              sheetAllowedDetents: "fitToContents",
-            }}
+            options={
+              {
+                //presentation: "formSheet",
+                //sheetAllowedDetents: "fitToContents",
+              }
+            }
           />
           ;
         </Stack>

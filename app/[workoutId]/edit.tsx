@@ -1,10 +1,12 @@
-import { View, Button as RNButton } from "react-native";
+import React from "react";
+import { View, Button as RNButton, Switch } from "react-native";
 import { useRouter, Stack, useLocalSearchParams } from "expo-router";
 
 import workouts from "../../data/workouts.json";
 import { useState } from "react";
 import { DateTimePicker, Gauge, Section } from "@expo/ui/swift-ui";
 import { Host, Text, HStack, VStack, Form } from "@expo/ui/swift-ui-primitives";
+import { ScrollView } from "react-native-gesture-handler";
 
 export default function EditWorkout() {
   const { workoutId } = useLocalSearchParams();
@@ -17,7 +19,7 @@ export default function EditWorkout() {
   console.log(workout);
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+    <>
       <Stack.Screen
         options={{
           title: workout?.name,
@@ -26,45 +28,47 @@ export default function EditWorkout() {
           ),
         }}
       />
-      <Host style={{ height: 600 }}>
-        <HStack spacing={20} frame={{ height: 150 }}>
-          <VStack frame={{ width: 100 }}>
-            <Text>Intensity</Text>
-            <Gauge
-              current={{ value: workout?.intensity }}
-              max={{ value: 100, label: "100" }}
-              min={{ value: 0, label: "0" }}
-              type="circular"
-              color={workout?.colorHex}
-            />
+      <ScrollView>
+        <Host matchContents useViewportSizeMeasurement>
+          <Form>
+            <Section title="SCHEDULE">
+              <DateTimePicker
+                onDateSelected={(date) => {
+                  try {
+                    workout!.nextScheduledTime = date.toISOString();
+                  } catch (error) {
+                    console.log(error);
+                  }
+                }}
+                displayedComponents="dateAndTime"
+                initialDate={workout?.nextScheduledTime}
+                variant="automatic"
+              />
+            </Section>
+            <Section title="OPTIONS">
+              <Switch
+                label="End with cooldown?"
+                value={workout?.needsCooldown}
+                onValueChange={() => {}}
+              />
+            </Section>
+          </Form>
+        </Host>
+        <Host style={{ height: 300 }}>
+          <VStack spacing={20} frame={{ height: 300 }}>
+            <HStack spacing={20}>
+              <Text>H0V0</Text>
+              <Text>H1V0</Text>
+            </HStack>
+            <HStack>
+              <HStack spacing={20}>
+                <Text>H0V1</Text>
+                <Text>H1V1</Text>
+              </HStack>
+            </HStack>
           </VStack>
-          <VStack frame={{ width: 100 }}>
-            <Text>Minutes</Text>
-            <Gauge
-              current={{ value: workout?.minutes }}
-              max={{ value: 100, label: "100" }}
-              min={{ value: 0, label: "0" }}
-              type="circular"
-              color={workout?.colorHex}
-            />
-          </VStack>
-        </HStack>
-        <Section title="SCHEDULE">
-          <DateTimePicker
-            onDateSelected={(date) => {
-              try {
-                workout!.nextScheduledTime = date.toISOString();
-              } catch (error) {
-                console.log(error);
-              }
-            }}
-            displayedComponents="dateAndTime"
-            initialDate={workout?.nextScheduledTime}
-            title="Next workout"
-            variant="automatic"
-          />
-        </Section>
-      </Host>
-    </View>
+        </Host>
+      </ScrollView>
+    </>
   );
 }
