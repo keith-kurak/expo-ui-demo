@@ -1,0 +1,94 @@
+diff --git a/build/swift-ui-primitives/Layout.js b/build/swift-ui-primitives/Layout.js
+index c10c6ac436e22394573fc178877bd57de4c61334..b79f1e6176ad93162f7ed4664ea1910a10783d4a 100644
+--- a/build/swift-ui-primitives/Layout.js
++++ b/build/swift-ui-primitives/Layout.js
+@@ -1,11 +1,13 @@
+ import { requireNativeView } from 'expo';
+ const HStackNativeView = requireNativeView('ExpoUI', 'HStackView');
+ export function HStack(props) {
+-    return <HStackNativeView {...props}/>;
++    const { onPress, ...restProps } = props;
++  return <HStackNativeView onHStackPressed={onPress} {...restProps} />;
+ }
+ const VStackNativeView = requireNativeView('ExpoUI', 'VStackView');
+ export function VStack(props) {
+-    return <VStackNativeView {...props}/>;
++    const { onPress, ...restProps } = props;
++  return <VStackNativeView onVStackPressed={onPress} {...restProps} />;
+ }
+ //#endregion
+ //# sourceMappingURL=Layout.js.map
+\ No newline at end of file
+diff --git a/ios/HStackView.swift b/ios/HStackView.swift
+index 93aeeaf2575e017bb1d9a139bc9a2ba6e6038eb5..2097fadff68e368675d18cc4769047bef78bde06 100644
+--- a/ios/HStackView.swift
++++ b/ios/HStackView.swift
+@@ -7,6 +7,7 @@ internal final class HStackViewProps: ExpoSwiftUI.ViewProps {
+   @Field var spacing: Double?
+   @Field var padding: Double?
+   @Field var frame: [String: Double]?
++  var onHStackPressed = EventDispatcher()
+ }
+ 
+ internal struct HStackView: ExpoSwiftUI.View {
+@@ -30,5 +31,8 @@ internal struct HStackView: ExpoSwiftUI.View {
+       horizontal: props.frame?["width"] != nil,
+       vertical: props.frame?["height"] != nil
+     )
++    .onTapGesture {
++        props.onHStackPressed()
++    }
+   }
+ }
+diff --git a/ios/VStackView.swift b/ios/VStackView.swift
+index 7996ad5dbbca6d1eaedfd5856f98acb599b505ea..010b142d21c3c0b2e622070eeb0de2732eec4a3a 100644
+--- a/ios/VStackView.swift
++++ b/ios/VStackView.swift
+@@ -7,6 +7,7 @@ internal final class VStackViewProps: ExpoSwiftUI.ViewProps {
+   @Field var spacing: Double?
+   @Field var padding: Double?
+   @Field var frame: [String: Double]?
++  var onVStackPressed = EventDispatcher()
+ }
+ 
+ internal struct VStackView: ExpoSwiftUI.View {
+@@ -30,5 +31,8 @@ internal struct VStackView: ExpoSwiftUI.View {
+       horizontal: props.frame?["width"] != nil,
+       vertical: props.frame?["height"] != nil
+     )
++    .onTapGesture {
++        props.onVStackPressed()
++    }
+   }
+ }
+diff --git a/src/swift-ui-primitives/Layout.tsx b/src/swift-ui-primitives/Layout.tsx
+index 8f3097f1733cefa8935252ac3185cb328cf1c974..05a874cd8f3408026bef2298188ce12c94733ac7 100644
+--- a/src/swift-ui-primitives/Layout.tsx
++++ b/src/swift-ui-primitives/Layout.tsx
+@@ -12,6 +12,7 @@ type StackBaseProps = {
+     maxWidth?: number;
+     maxHeight?: number;
+   };
++  onPress?: () => void;
+ };
+ 
+ //#region HStack Component
+@@ -21,7 +22,8 @@ const HStackNativeView: React.ComponentType<HStackProps> = requireNativeView(
+   'HStackView'
+ );
+ export function HStack(props: HStackProps) {
+-  return <HStackNativeView {...props} />;
++  const { onPress, ...restProps } = props;
++  return <HStackNativeView onHStackPressed={onPress} {...restProps} />;
+ }
+ //#endregion
+ 
+@@ -32,6 +34,7 @@ const VStackNativeView: React.ComponentType<VStackProps> = requireNativeView(
+   'VStackView'
+ );
+ export function VStack(props: VStackProps) {
+-  return <VStackNativeView {...props} />;
++  const { onPress, ...restProps } = props;
++  return <VStackNativeView onVStackPressed={onPress} {...restProps} />;
+ }
+ //#endregion

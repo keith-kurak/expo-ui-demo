@@ -59,5 +59,8 @@
     "eslint-config-expo": "~9.2.0",
     "typescript": "~5.8.3"
   },
-  "private": true
+  "private": true,
+  "patchedDependencies": {
+    "@expo/ui@0.1.1-canary-20250428-4156f88": "patches/@expo%2Fui@0.1.1-canary-20250428-4156f88.patch"
+  }
 }

@@ -8,8 +8,10 @@ import {
   Switch,
   BottomSheet,
   Section,
+  Gauge,
+  Host,
 } from "@expo/ui/swift-ui";
-import { HStack, VStack, Text } from "@expo/ui/swift-ui-primitives";
+import { HStack, VStack, Text, Form } from "@expo/ui/swift-ui-primitives";
 import { SymbolView, SymbolViewProps, SFSymbol } from "expo-symbols";
 import * as React from "react";
 
@@ -34,29 +36,62 @@ interface Workout {
 export default function ListScreen() {
   const [data, setData] = useState<Workout[]>(workouts);
   const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+
+  console.log(isBottomSheetOpen);
+
   return (
-    <List
-      listStyle="automatic"
-      scrollEnabled
-      selectEnabled
-      moveEnabled
-      deleteEnabled
-      onSelectionChange={(items) => {
-        console.log("select");
-        setSelectedWorkout(data[items[0]]);
-      }}
-    >
-      {workouts.map((workout) => (
-        <HStack key={workout.id}>
-          <HStack spacing={20} frame={{ width: 40 }}>
-            <SymbolView
-              name={workout.iconName as SFSymbol}
-              tintColor={workout.colorHex}
-            />
+    <>
+      <List listStyle="automatic" scrollEnabled moveEnabled deleteEnabled>
+        {workouts.map((workout) => (
+          <HStack
+            onPress={() => {
+              setSelectedWorkout(workout);
+              setIsBottomSheetOpen(true);
+            }}
+            key={workout.id}
+          >
+            <HStack spacing={20} frame={{ width: 40 }}>
+              <SymbolView
+                name={workout.iconName as SFSymbol}
+                tintColor={workout.colorHex}
+              />
+            </HStack>
+            <Text>{` ${workout.name}`}</Text>
           </HStack>
-          <Text>{` ${workout.name}`}</Text>
-        </HStack>
-      ))}
-    </List>
+        ))}
+      </List>
+      <BottomSheet
+        onIsOpenedChange={(e) => setIsBottomSheetOpen(e)}
+        isOpened={isBottomSheetOpen}
+      >
+        <View style={{ height: 300 }}>
+          <List scrollEnabled>
+            <VStack spacing={20} frame={{ height: 200 }}>
+              <Text>{selectedWorkout?.name}</Text>
+              <HStack>
+                <VStack>
+                  <Text>Intensity</Text>
+                  <Gauge
+                    current={{ value: selectedWorkout?.intensity }}
+                    max={{ value: 100, label: "100" }}
+                    min={{ value: 0, label: "0" }}
+                  />
+                </VStack>
+                <VStack>
+                  <Text>Minutes</Text>
+                  <Gauge
+                    current={{ value: selectedWorkout?.minutes }}
+                    max={{ value: 100, label: "100" }}
+                    min={{ value: 0, label: "0" }}
+                  />
+                </VStack>
+              </HStack>
+              <Button onPress={() => setIsBottomSheetOpen(false)}>Close</Button>
+            </VStack>
+          </List>
+        </View>
+      </BottomSheet>
+    </>
   );
 }
