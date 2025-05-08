@@ -1,11 +1,21 @@
 import React from "react";
-import { View, Button as RNButton, Switch } from "react-native";
+import { View, Button as RNButton } from "react-native";
 import { useRouter, Stack, useLocalSearchParams } from "expo-router";
 
 import workouts from "../../data/workouts.json";
 import { useState } from "react";
-import { DateTimePicker, Gauge, Section } from "@expo/ui/swift-ui";
-import { Host, Text, HStack, VStack, Form } from "@expo/ui/swift-ui-primitives";
+import {
+  Host,
+  Switch,
+  Picker,
+  Section,
+  Button,
+  Text,
+  Form,
+  VStack,
+  HStack,
+  DateTimePickerPrimitive,
+} from "@expo/ui/swift-ui-primitives";
 import { ScrollView } from "react-native-gesture-handler";
 
 export default function EditWorkout() {
@@ -18,6 +28,15 @@ export default function EditWorkout() {
 
   console.log(workout);
 
+  const [playSounds, setPlaySounds] = useState(true);
+  const [sendReadReceipts, setSendReadReceipts] = useState(false);
+
+  const notifyOptions = ["Direct Messages", "Mentions", "Anything"];
+  const [selectedNotifyIndex, setSelectedNotifyIndex] = useState<number>(0);
+  const profileImageSizes = ["Large", "Medium", "Small"];
+  const [selectedProfileImageSizeIndex, setSelectedProfileImageSizeIndex] =
+    useState<number>(0);
+
   return (
     <>
       <Stack.Screen
@@ -28,32 +47,7 @@ export default function EditWorkout() {
           ),
         }}
       />
-      <ScrollView>
-        <Host matchContents useViewportSizeMeasurement>
-          <Form>
-            <Section title="SCHEDULE">
-              <DateTimePicker
-                onDateSelected={(date) => {
-                  try {
-                    workout!.nextScheduledTime = date.toISOString();
-                  } catch (error) {
-                    console.log(error);
-                  }
-                }}
-                displayedComponents="dateAndTime"
-                initialDate={workout?.nextScheduledTime}
-                variant="automatic"
-              />
-            </Section>
-            <Section title="OPTIONS">
-              <Switch
-                label="End with cooldown?"
-                value={workout?.needsCooldown}
-                onValueChange={() => {}}
-              />
-            </Section>
-          </Form>
-        </Host>
+      <View style={{ flex: 1 }}>
         <Host style={{ height: 300 }}>
           <VStack spacing={20} frame={{ height: 300 }}>
             <HStack spacing={20}>
@@ -68,7 +62,56 @@ export default function EditWorkout() {
             </HStack>
           </VStack>
         </Host>
-      </ScrollView>
+        <Host style={{ height: 500 }}>
+          <Form>
+            {/* Notifications Section */}
+            <Section title="Notifications">
+              <Picker
+                variant="menu"
+                label="Notify Me About"
+                options={notifyOptions}
+                selectedIndex={selectedNotifyIndex}
+                onOptionSelected={({ nativeEvent: { index } }) => {
+                  setSelectedNotifyIndex(index);
+                }}
+              />
+              <Switch
+                label="Play notification sounds"
+                value={playSounds}
+                onValueChange={setPlaySounds}
+              />
+              <Switch
+                label="Send read receipts"
+                value={sendReadReceipts}
+                onValueChange={setSendReadReceipts}
+              />
+              <Text weight="regular" size={17}>
+                plain text
+              </Text>
+            </Section>
+
+            {/* User Profiles Section */}
+            <Section title="User Profiles">
+              <Picker
+                variant="menu"
+                label="Profile Image Size"
+                options={profileImageSizes}
+                selectedIndex={selectedProfileImageSizeIndex}
+                onOptionSelected={({ nativeEvent: { index } }) => {
+                  setSelectedProfileImageSizeIndex(index);
+                }}
+              />
+              <Button
+                onPress={() => {
+                  alert("Fake cache cleared");
+                }}
+              >
+                Clear Image Cache
+              </Button>
+            </Section>
+          </Form>
+        </Host>
+      </View>
     </>
   );
 }
