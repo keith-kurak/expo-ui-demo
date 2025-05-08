@@ -18,7 +18,7 @@ import * as React from "react";
 // Import workout data
 import workouts from "../data/workouts.json";
 import { useState } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 
 interface Workout {
   id: number;
@@ -41,8 +41,14 @@ export default function ListScreen() {
   console.log(isBottomSheetOpen);
 
   return (
-    <>
-      <List listStyle="automatic" scrollEnabled moveEnabled deleteEnabled>
+    <ScrollView
+      contentContainerStyle={{
+        flex: 1,
+        justifyContent: "flex-start",
+        alignItems: "flex-start",
+      }}
+    >
+      <List listStyle="automatic" moveEnabled deleteEnabled>
         {workouts.map((workout) => (
           <HStack
             onPress={() => {
@@ -61,14 +67,14 @@ export default function ListScreen() {
           </HStack>
         ))}
       </List>
-      <BottomSheet
-        onIsOpenedChange={(e) => setIsBottomSheetOpen(e)}
-        isOpened={isBottomSheetOpen}
-      >
-        <View style={{ height: 300 }}>
-          <List scrollEnabled>
-            <VStack spacing={20} frame={{ height: 200 }}>
-              <Text>{selectedWorkout?.name}</Text>
+      <View style={{ position: "absolute", bottom: 0, left: 0, right: 0 }}>
+        <BottomSheet
+          onIsOpenedChange={(e) => setIsBottomSheetOpen(e)}
+          isOpened={isBottomSheetOpen}
+        >
+          <Form style={{ height: 200 }}>
+            <Text>{selectedWorkout?.name}</Text>
+            <Section title="" style={{ flex: 1 }}>
               <HStack>
                 <VStack>
                   <Text>Intensity</Text>
@@ -87,11 +93,11 @@ export default function ListScreen() {
                   />
                 </VStack>
               </HStack>
-              <Button onPress={() => setIsBottomSheetOpen(false)}>Close</Button>
-            </VStack>
-          </List>
-        </View>
-      </BottomSheet>
-    </>
+            </Section>
+            <Button onPress={() => setIsBottomSheetOpen(false)}>Close</Button>
+          </Form>
+        </BottomSheet>
+      </View>
+    </ScrollView>
   );
 }
