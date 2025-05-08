@@ -10,6 +10,7 @@ import {
   Section,
   Gauge,
   Host,
+  DateTimePicker,
 } from "@expo/ui/swift-ui";
 import { HStack, VStack, Text, Form } from "@expo/ui/swift-ui-primitives";
 import { SymbolView, SymbolViewProps, SFSymbol } from "expo-symbols";
@@ -61,12 +62,12 @@ export default function ListScreen() {
           </HStack>
         ))}
       </List>
-      <View style={{ position: "absolute", bottom: 0, left: 0, right: 0 }}>
-        <BottomSheet
-          onIsOpenedChange={(e) => setIsBottomSheetOpen(e)}
-          isOpened={isBottomSheetOpen}
-        >
-          <Form style={{ height: 200 }}>
+      <BottomSheet
+        onIsOpenedChange={(e) => setIsBottomSheetOpen(e)}
+        isOpened={isBottomSheetOpen}
+      >
+        <Host matchContents useViewportSizeMeasurement>
+          <VStack frame={{ height: 300 }}>
             <Text>{selectedWorkout?.name}</Text>
             <Section title="">
               <HStack>
@@ -76,6 +77,8 @@ export default function ListScreen() {
                     current={{ value: selectedWorkout?.intensity }}
                     max={{ value: 100, label: "100" }}
                     min={{ value: 0, label: "0" }}
+                    type="circular"
+                    color={selectedWorkout?.colorHex}
                   />
                 </VStack>
                 <VStack>
@@ -84,14 +87,29 @@ export default function ListScreen() {
                     current={{ value: selectedWorkout?.minutes }}
                     max={{ value: 100, label: "100" }}
                     min={{ value: 0, label: "0" }}
+                    type="circular"
+                    color={selectedWorkout?.colorHex}
                   />
                 </VStack>
               </HStack>
             </Section>
-            <Button onPress={() => setIsBottomSheetOpen(false)}>Close</Button>
-          </Form>
-        </BottomSheet>
-      </View>
+            <Section title="Intensity">
+              <DateTimePicker
+                onDateSelected={(date) => {
+                  try {
+                    selectedWorkout!.nextScheduledTime = date.toISOString();
+                  } catch (error) {
+                    console.log(error);
+                  }
+                }}
+                displayedComponents="dateAndTime"
+                initialDate={selectedWorkout?.nextScheduledTime}
+                variant="automatic"
+              />
+            </Section>
+          </VStack>
+        </Host>
+      </BottomSheet>
     </>
   );
 }
