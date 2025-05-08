@@ -9,14 +9,17 @@ import {
   Switch,
   Picker,
   Section,
-  Button,
   Text,
   Form,
   VStack,
   HStack,
-  DateTimePickerPrimitive,
+  DateTimePicker,
+  Gauge,
+  TextInput,
+  ColorPicker,
+  Button,
 } from "@expo/ui/swift-ui-primitives";
-import { ScrollView } from "react-native-gesture-handler";
+import {} from "@expo/ui/swift-ui";
 
 export default function EditWorkout() {
   const { workoutId } = useLocalSearchParams();
@@ -48,68 +51,92 @@ export default function EditWorkout() {
         }}
       />
       <View style={{ flex: 1 }}>
-        <Host style={{ height: 300 }}>
-          <VStack spacing={20} frame={{ height: 300 }}>
-            <HStack spacing={20}>
-              <Text>H0V0</Text>
-              <Text>H1V0</Text>
-            </HStack>
-            <HStack>
-              <HStack spacing={20}>
-                <Text>H0V1</Text>
-                <Text>H1V1</Text>
-              </HStack>
-            </HStack>
-          </VStack>
+        <Host style={{ height: 150 }}>
+          <HStack spacing={60} frame={{ height: 150 }}>
+            <VStack spacing={20}>
+              <Text>Intensity</Text>
+              <Gauge
+                current={{
+                  value: workout?.intensity,
+                  label: workout?.intensity.toString(),
+                }}
+                max={{ value: 100, label: "100" }}
+                min={{ value: 0, label: "0" }}
+                type="circular"
+                color={workout?.colorHex}
+              />
+            </VStack>
+            <VStack spacing={20}>
+              <Text>Minutes</Text>
+              <Gauge
+                current={{
+                  value: workout?.minutes,
+                  label: workout?.minutes.toString(),
+                }}
+                max={{ value: 100, label: "100" }}
+                min={{ value: 0, label: "0" }}
+                type="circular"
+                color={workout?.colorHex}
+              />
+            </VStack>
+          </HStack>
         </Host>
-        <Host style={{ height: 500 }}>
+        <Host style={{ height: 400 }}>
           <Form>
-            {/* Notifications Section */}
-            <Section title="Notifications">
-              <Picker
-                variant="menu"
-                label="Notify Me About"
-                options={notifyOptions}
-                selectedIndex={selectedNotifyIndex}
-                onOptionSelected={({ nativeEvent: { index } }) => {
-                  setSelectedNotifyIndex(index);
+            <Section title="SCHEDULE">
+              <DateTimePicker
+                onDateSelected={(date) => {
+                  try {
+                    workout!.nextScheduledTime = date.toISOString();
+                  } catch (error) {
+                    console.log(error);
+                  }
                 }}
+                title="Next workout"
+                displayedComponents="dateAndTime"
+                initialDate={workout?.nextScheduledTime}
+                variant="automatic"
               />
-              <Switch
-                label="Play notification sounds"
-                value={playSounds}
-                onValueChange={setPlaySounds}
-              />
-              <Switch
-                label="Send read receipts"
-                value={sendReadReceipts}
-                onValueChange={setSendReadReceipts}
-              />
-              <Text weight="regular" size={17}>
-                plain text
-              </Text>
             </Section>
-
-            {/* User Profiles Section */}
-            <Section title="User Profiles">
+            <Section title="WORKOUT TYPE">
               <Picker
-                variant="menu"
-                label="Profile Image Size"
-                options={profileImageSizes}
-                selectedIndex={selectedProfileImageSizeIndex}
-                onOptionSelected={({ nativeEvent: { index } }) => {
-                  setSelectedProfileImageSizeIndex(index);
-                }}
+                options={["Strength", "Cardio", "Other"]}
+                selectedIndex={["Strength", "Cardio", "Other"].findIndex(
+                  (w) => w === workout?.workoutType
+                )}
+                onOptionSelected={({ nativeEvent: { index } }) => {}}
               />
-              <Button
-                onPress={() => {
-                  alert("Fake cache cleared");
+            </Section>
+            <Section title="OPTIONS">
+              <TextInput
+                defaultValue={workout?.reps}
+                onChangeText={() => {}}
+                placeholder="Reps"
+              />
+              <Switch
+                label="End with cooldown?"
+                value={workout?.needsCooldown}
+                onValueChange={() => {}}
+              />
+              <ColorPicker
+                label="Select a color"
+                selection={workout?.colorHex}
+                onValueChanged={(color) => {
+                  setWorkout({ ...workout, colorHex: color });
                 }}
-              >
-                Clear Image Cache
-              </Button>
+                style={{ width: 400, height: 200 }}
+              />
             </Section>
           </Form>
+        </Host>
+        <Host style={{ height: 20 }}>
+          <Button
+            onPress={() => {}}
+            variant="borderedProminent"
+            color={workout?.colorHex}
+          >
+            Start Workout
+          </Button>
         </Host>
       </View>
     </>
