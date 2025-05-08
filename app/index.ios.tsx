@@ -41,13 +41,7 @@ export default function ListScreen() {
   console.log(isBottomSheetOpen);
 
   return (
-    <ScrollView
-      contentContainerStyle={{
-        flex: 1,
-        justifyContent: "flex-start",
-        alignItems: "flex-start",
-      }}
-    >
+    <>
       <List listStyle="automatic" moveEnabled deleteEnabled>
         {workouts.map((workout) => (
           <HStack
@@ -74,7 +68,7 @@ export default function ListScreen() {
         >
           <Form style={{ height: 200 }}>
             <Text>{selectedWorkout?.name}</Text>
-            <Section title="" style={{ flex: 1 }}>
+            <Section title="">
               <HStack>
                 <VStack>
                   <Text>Intensity</Text>
@@ -98,6 +92,6 @@ export default function ListScreen() {
           </Form>
         </BottomSheet>
       </View>
-    </ScrollView>
+    </>
   );
 }
