@@ -110,13 +110,20 @@ export default function EditWorkout() {
             <Section title="OPTIONS">
               <TextInput
                 defaultValue={workout?.reps}
-                onChangeText={() => {}}
+                onChangeText={(text) => {
+                  setWorkout({ ...workout, reps: text });
+                }}
                 placeholder="Reps"
               />
               <Switch
                 label="End with cooldown?"
                 value={workout?.needsCooldown}
-                onValueChange={() => {}}
+                onValueChange={() => {
+                  setWorkout({
+                    ...workout,
+                    needsCooldown: !workout?.needsCooldown,
+                  });
+                }}
               />
               <ColorPicker
                 label="Select a color"
